@@ -1,4 +1,4 @@
-import * as THREE from 'three/src/Three.js';
+import * as THREE from 'three';
 import { ARENA_R, TARGET_CIRCLE_R } from '../config';
 import { SPREAD_OFFSETS, type Vec2, type Volley } from '../game/lanes';
 import type { BandEmphasis } from '../game/slides';
