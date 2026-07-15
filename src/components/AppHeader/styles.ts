@@ -32,10 +32,30 @@ export const HeaderActions = styled.div`
   gap: 8px;
 `;
 
+export const LanguageSelectWrapper = styled.div`
+  position: relative;
+  display: inline-flex;
+
+  &::after {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    width: 6px;
+    height: 6px;
+    content: '';
+    border-right: 2px solid var(--trainer-text-muted);
+    border-bottom: 2px solid var(--trainer-text-muted);
+    transform: translateY(-70%) rotate(45deg);
+    pointer-events: none;
+  }
+`;
+
 export const LanguageSelect = styled.select`
   ${buttonStyles};
+  padding-right: 36px;
   color: var(--trainer-text-soft);
   cursor: pointer;
+  appearance: none;
 
   option {
     color: var(--trainer-text);

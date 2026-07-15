@@ -1,4 +1,4 @@
-import * as THREE from 'three/src/Three.js';
+import * as THREE from 'three';
 import { SHOT_R, SHOT_STEPS } from '../config';
 import { SPREAD_OFFSETS, stepDistance, TRAVEL, type Volley } from '../game/lanes';
 import { activeGroundFade, firingStep, residualFade, warningArrowFrame } from './exaAnimation';

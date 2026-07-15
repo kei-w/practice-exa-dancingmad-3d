@@ -1,4 +1,4 @@
-import * as THREE from 'three/src/Three.js';
+import * as THREE from 'three';
 import { ARENA_R, LANE_W } from '../config';
 
 export type BasicMesh = THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;

@@ -1,91 +1,92 @@
-# P5 エクサ練習 3D（混沌の終末）
+# P5 Exaflare Practice 3D (Stray Apocalypse)
 
-[English](README.en.md) | 日本語
+English | [日本語](README.ja.md)
 
-FF14「絶妖星乱舞」P5 のエクサフレア回避を 3D 視点で練習できる非公式トレーナーです。
+An unofficial 3D practice tool for the P5 Exaflare sequence, **Stray Apocalypse**, in FINAL FANTASY XIV's **Dancing Mad (Ultimate)**.
 
-練習できるギミック内容（6ウェーブ・左/中/右パターン等）は
-[オリジナルの2D版練習ページ](https://github.com/pilsnerdrinker/practice-exa-dancingmad) を参考にしていますが、
-コードはギミックの仕様に基づく独自実装です（座標系・判定・描画とも元コードとは別物です）。
-エクサの座標・半径・タイミングは、俯瞰の検証動画から測定した値に合わせて調整しています。
-当たり判定は実際のエクサフレアに合わせた円判定を採用しています。
-実践練習では、表示より2タイミング早く移動する着弾判定で被弾判定します。
+The mechanics available for practice—including the six waves and the left, center, and right patterns—are based on the
+[original 2D practice tool](https://github.com/pilsnerdrinker/practice-exa-dancingmad).
+The code itself is an independent implementation of the mechanic; its coordinate system, hit detection, and rendering do not reuse the original tool's code.
 
-画面右上の言語セレクターで日本語と英語を切り替えられます。
-初回はブラウザの言語設定を使用し、選択した言語はブラウザに保存されます。
+The Exaflare positions, radii, and timing have been calibrated against overhead reference footage.
+Hit detection uses circular areas matching the in-game Exaflares.
+In Practice Mode, collision is checked against impact positions that advance two timing steps ahead of the displayed effects.
 
-## 操作
+Use the language selector in the upper-right corner to switch between Japanese and English.
+The app uses the browser language on the first visit and saves the selected language in the browser.
+The waymark layout and radius, resolve speed, and one-at-a-time preference are also saved and restored on later visits.
 
-| 操作 | 内容 |
+## Controls
+
+| Input | Action |
 | --- | --- |
-| `W` `A` `S` `D`（または矢印キー） | 自キャラ移動（W = カメラの向いている方向） |
-| マウス右ドラッグ | カメラ回転（自キャラ追従の三人称視点） |
-| マウスホイール | ズーム |
-| 左クリック（位置確認モード） | クリック位置の安地判定 |
-| 左スティック | 自キャラ移動（アナログ・カメラ基準） |
-| 右スティック | カメラ回転 |
-| `L1(LB)` + 右スティック上下 | ズーム |
+| `W` `A` `S` `D` or arrow keys | Move your character (`W` moves in the direction the camera is facing) |
+| Right mouse drag | Rotate the third-person camera around your character |
+| Mouse wheel | Zoom in or out |
+| Left click in Position Review Mode | Check whether the clicked position is safe |
+| Left stick | Move your character with analog, camera-relative controls |
+| Right stick | Rotate the camera |
+| `L1` (`LB`) + right stick up/down | Zoom in or out |
 
-コントローラは FF14 の標準コンフィグ風の挙動です。
-ブラウザの仕様上、**一度何かボタンを押すまで**コントローラは認識されません。
+The gamepad controls are modeled after FFXIV's default controller configuration.
+Due to browser restrictions, the gamepad is not detected until you press one of its buttons at least once.
 
-## モード
+## Modes
 
-- **位置確認**: 各ウェーブの直線攻撃と次の予兆をスライドで確認。フィールドをクリックすると安地判定
-- **実践練習**: カウントダウン後にエクサ開始。キャラを操作して全6ウェーブを回避
+- **Position Review**: Step through each wave's line attacks and the next telegraph. Click the arena to check whether a position is safe.
+- **Practice**: After a countdown, control your character and avoid all six waves of Stray Apocalypse.
 
-エクサ発動速度はスライダーで 2.5〜5.0 秒に調整できます（初期値4.4秒）。
-「一問ごと」で自動送りを止められ、前の問題/同じ問題/新しい問題を切り替えられます。
+The interval between Exaflare impacts can be adjusted from 2.5 to 5.0 seconds with the speed slider; the default is 4.4 seconds.
+Enable the one-at-a-time option to stop automatic progression, then switch between the previous, current, and a new problem.
 
-フィールドマーカーは FF14 風の光柱表現で、`A`(北)から時計回りに 90 度刻みで `A/B/C/D`、
-数字はその 45 度ずれのコーナーに等距離（45度刻み）で配置しています。
-配置半径は「マーカー」スライダーで 25〜50（整数、初期値35）に調整できます。
-`2341`（北西=1 北東=2 南東=3 南西=4）/ `1234`（北東=1 から時計回り）ボタンで
-数字の割り当てを切り替えられます。
+The arena waymarks are rendered as FFXIV-style pillars of light.
+The lettered waymarks `A/B/C/D` are placed at 90-degree intervals clockwise from `A` at north, while the numbered waymarks are placed on the intercardinal points offset by 45 degrees.
+Their distance from the center can be adjusted from 25 to 50 with the Waymark slider; the default is 35.
+Use the `2341` layout (1 = northwest, 2 = northeast, 3 = southeast, 4 = southwest) or the `1234` layout (1 = northeast, then clockwise) to change the number assignments.
 
-## 開発
+## Development
 
-ツールチェーンは [mise](https://mise.jdx.dev/) で管理しています（Node LTS + pnpm）。
+The toolchain is managed with [mise](https://mise.jdx.dev/) and uses Node.js LTS with pnpm.
 
 ```sh
-mise install        # node / pnpm のセットアップ
-pnpm install        # 依存関係のインストール
-pnpm dev            # 開発サーバー起動 (http://localhost:5173)
-pnpm build          # 本番ビルド (dist/)
-pnpm format         # Biome でフォーマット
-pnpm lint           # Biome で lint
-pnpm check          # フォーマット + lint をまとめて実行（自動修正あり）
-pnpm typecheck      # tsc --noEmit での型チェック
+mise install        # Set up Node.js and pnpm
+pnpm install        # Install dependencies
+pnpm dev            # Start the development server (http://localhost:5173)
+pnpm build          # Create a production build in dist/
+pnpm format         # Format with Biome
+pnpm lint           # Lint with Biome
+pnpm check          # Format and lint, applying automatic fixes
+pnpm typecheck      # Run TypeScript type checking with tsc --noEmit
 ```
 
-## 構成
+## Project Structure
 
-UI は React 19、スタイリングは [Emotion](https://emotion.sh/) の styled components を使用しています。
+The UI is built with React 19 and styled components from [Emotion](https://emotion.sh/).
 
-- [index.html](index.html) — React のマウントポイント
-- [src/App.tsx](src/App.tsx) — 画面全体のコンポーネント構成
-- [src/App.styles.ts](src/App.styles.ts) — 画面全体のレイアウトスタイル
-- [src/components/](src/components) — ヘッダー、操作バー、3Dステージ、ステータスパネル
-- [src/hooks/useTrainer.ts](src/hooks/useTrainer.ts) — React とゲームコントローラーの接続
-- [src/i18n/](src/i18n) — 日本語／英語の翻訳辞書と言語切替Context
-- [src/styles/GlobalStyles.tsx](src/styles/GlobalStyles.tsx) — グローバルスタイル
-- [src/game/controller.ts](src/game/controller.ts) — React とゲームループ／Three.js の橋渡し
-- [src/config.ts](src/config.ts) — ゲーム設定値（フィールド半径、レーン数、タイミング等）
-- [src/game/](src/game) — ゲームロジック
-  - `lanes.ts` — レーン幾何（方向ベクトル・レーン判定・着弾円の当たり判定）
-  - `problem.ts` — 問題生成と履歴（`ProblemHistory`）
-  - `practiceSession.ts` — 実践練習の状態・タイミング・移動ロジック
-  - `settings.ts` — UIから変更できる練習設定
-  - `slides.ts` — 位置確認モードのスライド生成
-  - `viewFormatters.ts` — React表示用のフォーマット関数
-- [src/three/](src/three) — Three.js 描画
-  - `primitives.ts` — ディスク/リング/帯ジオメトリ・テキストスプライト・テクスチャ
-  - `markers.ts` — FF14 風フィールドマーカー
-  - `scene.ts` — `Scene3D`（フィールド、エクサ描画、プレイヤー、カメラ、マウス入力）
-- [src/input/](src/input) — `keyboard.ts`（WASD/矢印)、`gamepad.ts`（FF14風パッド操作）
-- [src/main.tsx](src/main.tsx) — React エントリーポイント
+- [index.html](index.html) — React mount point
+- [src/App.tsx](src/App.tsx) — Top-level component composition
+- [src/App.styles.ts](src/App.styles.ts) — Top-level layout styles
+- [src/components/](src/components) — Header, controls, 3D stage, and status panel
+- [src/hooks/useTrainer.ts](src/hooks/useTrainer.ts) — Connects React to the game controller
+- [src/i18n/](src/i18n) — Japanese/English dictionaries and language-switching context
+- [src/styles/GlobalStyles.tsx](src/styles/GlobalStyles.tsx) — Global styles
+- [src/game/controller.ts](src/game/controller.ts) — Bridge between React, the game loop, and Three.js
+- [src/config.ts](src/config.ts) — Game configuration such as arena radius, lane count, and timing
+- [src/game/](src/game) — Game logic
+  - `lanes.ts` — Lane geometry, direction vectors, lane checks, and circular impact hit detection
+  - `problem.ts` — Problem generation and history (`ProblemHistory`)
+  - `practiceSession.ts` — Practice state, timing, and movement logic
+  - `settings.ts` — User-adjustable practice settings
+  - `slides.ts` — Slide generation for Position Review Mode
+  - `viewFormatters.ts` — Formatting helpers for the React UI
+- [src/three/](src/three) — Three.js rendering
+  - `primitives.ts` — Disc, ring, and strip geometry; text sprites; and textures
+  - `markers.ts` — FFXIV-style arena waymarks
+  - `scene.ts` — `Scene3D`, including the arena, Exaflares, player, camera, and mouse input
+- [src/input/](src/input) — `keyboard.ts` for WASD/arrow keys and `gamepad.ts` for FFXIV-style gamepad controls
+- [src/main.tsx](src/main.tsx) — React entry point
 
-## 注意
+## Disclaimer
 
-- 個人制作の非公式練習ツールです。
-- 実際の処理手順やコールは、参加するパーティーの方針に合わせてください。
+- This is an unofficial, fan-made practice tool.
+- Follow your group's chosen strategy and callouts in the actual encounter.
