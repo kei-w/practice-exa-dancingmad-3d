@@ -14,6 +14,7 @@ In Practice Mode, collision is checked against impact positions that advance two
 
 Use the language selector in the upper-right corner to switch between Japanese and English.
 The app uses the browser language on the first visit and saves the selected language in the browser.
+The waymark layout and radius, resolve speed, and one-at-a-time preference are also saved and restored on later visits.
 
 ## Controls
 

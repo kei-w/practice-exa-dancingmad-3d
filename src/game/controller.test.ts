@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { TrainerController, type TrainerScene } from './controller';
+import {
+  loadTrainerSettings,
+  type SettingsStorage,
+  TRAINER_SETTINGS_STORAGE_KEY,
+  type TrainerSettings,
+} from './settings';
 import type { TrainerViewState } from './trainerView';
 
 function createSceneStub(): TrainerScene {
@@ -26,13 +32,14 @@ function createSceneStub(): TrainerScene {
   };
 }
 
-function createHarness() {
+function createHarness(settingsStorage?: SettingsStorage | null) {
   let now = 0;
   let frame: FrameRequestCallback = () => undefined;
   const views: TrainerViewState[] = [];
   const controller = new TrainerController({} as HTMLElement, (view) => views.push(view), {
     createScene: createSceneStub,
     exposeDebug: false,
+    settingsStorage,
     runtime: {
       now: () => now,
       requestFrame: (callback) => {
@@ -86,6 +93,38 @@ describe('TrainerController', () => {
     expect(harness.latest()?.slideTitle).toBe('1回目の予兆');
     harness.controller.setLocale('en');
     expect(harness.latest()?.slideTitle).toBe('Wave 1 telegraph');
+    harness.controller.dispose();
+  });
+
+  it('restores and saves trainer settings', () => {
+    const initial: TrainerSettings = {
+      markerPreset: '1234',
+      markerRadius: 42,
+      oneByOne: true,
+      resolveMs: 3200,
+    };
+    let stored = JSON.stringify({ version: 1, ...initial });
+    const storage: SettingsStorage = {
+      getItem: (key) => (key === TRAINER_SETTINGS_STORAGE_KEY ? stored : null),
+      setItem: (key, value) => {
+        if (key === TRAINER_SETTINGS_STORAGE_KEY) stored = value;
+      },
+    };
+    const harness = createHarness(storage);
+
+    expect(harness.latest()).toMatchObject(initial);
+
+    harness.controller.toggleMarkerPreset();
+    harness.controller.setMarkerRadius(33.6);
+    harness.controller.setResolveSpeed(3.26);
+    harness.controller.toggleStepMode();
+
+    expect(loadTrainerSettings(storage)).toEqual({
+      markerPreset: '2341',
+      markerRadius: 34,
+      oneByOne: false,
+      resolveMs: 3300,
+    });
     harness.controller.dispose();
   });
 });

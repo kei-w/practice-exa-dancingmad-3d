@@ -20,7 +20,15 @@ import {
   type VolleyTiming,
 } from './practiceSession';
 import { ProblemHistory } from './problem';
-import { MARKER_RADIUS, type MarkerPreset, RESOLVE_SPEED } from './settings';
+import {
+  loadTrainerSettings,
+  type MarkerPreset,
+  normalizeMarkerRadius,
+  normalizeResolveMs,
+  saveTrainerSettings,
+  type SettingsStorage,
+  type TrainerSettings,
+} from './settings';
 import { makeSlides, type BandEmphasis } from './slides';
 import { INITIAL_TRAINER_VIEW, type LogClass, type LogEntry, type Mode, type TrainerViewState } from './trainerView';
 
@@ -80,6 +88,7 @@ export interface TrainerControllerOptions {
   runtime?: Partial<TrainerRuntime>;
   exposeDebug?: boolean;
   locale?: Locale;
+  settingsStorage?: SettingsStorage | null;
 }
 
 declare global {
@@ -114,9 +123,10 @@ export class TrainerController {
   private readonly onView: (view: TrainerViewState) => void;
   private readonly disposeKeyboard: () => void;
   private readonly disposeGamepad: () => void;
+  private readonly settingsStorage: SettingsStorage | null | undefined;
   private locale: Locale;
-  private state: PresentationState = { ...INITIAL_PRESENTATION_STATE, logs: [] };
-  private lastView: TrainerViewState = { ...INITIAL_TRAINER_VIEW, logs: [] };
+  private state: PresentationState;
+  private lastView: TrainerViewState;
   private advanceTimer: number | null = null;
   private autoTimer: number | null = null;
   private hitFlashTimer: number | null = null;
@@ -127,6 +137,10 @@ export class TrainerController {
   private disposed = false;
 
   constructor(stage: HTMLElement, onView: (view: TrainerViewState) => void, options: TrainerControllerOptions = {}) {
+    this.settingsStorage = options.settingsStorage;
+    const settings = loadTrainerSettings(this.settingsStorage);
+    this.state = { ...INITIAL_PRESENTATION_STATE, ...settings, logs: [] };
+    this.lastView = { ...INITIAL_TRAINER_VIEW, ...settings, logs: [] };
     this.onView = onView;
     this.locale = options.locale ?? 'ja';
     this.runtime = { ...browserRuntime, ...options.runtime };
@@ -210,14 +224,13 @@ export class TrainerController {
   }
 
   setMarkerRadius(value: number): void {
-    const markerRadius = Math.min(MARKER_RADIUS.max, Math.max(MARKER_RADIUS.min, Math.round(value)));
+    const markerRadius = normalizeMarkerRadius(value);
     this.scene.renderMarkers(this.state.markerPreset, markerRadius);
     this.patch({ markerRadius });
   }
 
   setResolveSpeed(seconds: number): void {
-    const clamped = Math.min(RESOLVE_SPEED.maxSeconds, Math.max(RESOLVE_SPEED.minSeconds, seconds));
-    this.patch({ resolveMs: Math.round(clamped * 1000) });
+    this.patch({ resolveMs: normalizeResolveMs(seconds * 1000) });
   }
 
   quizBack(toPage = 0): void {
@@ -308,7 +321,24 @@ export class TrainerController {
 
   private patch(next: Partial<PresentationState>): void {
     this.state = { ...this.state, ...next };
+    if (
+      next.markerPreset !== undefined ||
+      next.markerRadius !== undefined ||
+      next.oneByOne !== undefined ||
+      next.resolveMs !== undefined
+    ) {
+      saveTrainerSettings(this.currentSettings(), this.settingsStorage);
+    }
     this.emit();
+  }
+
+  private currentSettings(): TrainerSettings {
+    return {
+      markerPreset: this.state.markerPreset,
+      markerRadius: this.state.markerRadius,
+      oneByOne: this.state.oneByOne,
+      resolveMs: this.state.resolveMs,
+    };
   }
 
   private log(key: TranslationKey, className: LogClass = 'e', params?: TranslationParams): void {
